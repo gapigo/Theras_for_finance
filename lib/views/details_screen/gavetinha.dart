@@ -13,20 +13,28 @@ class ListaGavetinha {
       ];
 }
 
+typedef void KeyMapCallback(Map keyMap);
+
 class Gavetinha extends StatefulWidget {
   late Color backgroundColorParam;
   late Color textColorParam;
   late String legendaParam;
   late List<String> listaParam;
+  late KeyMapCallback? keyMapParam;
+
   // final Color textColor = Colors.black;
   Gavetinha(String legenda, List<String> lista,
       {Color backgroundColor = Colors.white,
       Color textColor = Colors.black,
+      KeyMapCallback? keyMap,
       super.key}) {
     backgroundColorParam = backgroundColor;
     textColorParam = textColor;
     legendaParam = legenda;
     listaParam = lista;
+    keyMapParam = keyMap;
+    print("PIROCA ENVERGADA");
+    print(keyMap);
   }
 
   @override
@@ -39,6 +47,8 @@ class GavetinhaState extends State<Gavetinha> {
   late Color backgroundColor;
   late Color textColor;
   late String legenda;
+  late KeyMapCallback? keyMap;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +57,7 @@ class GavetinhaState extends State<Gavetinha> {
     legenda = widget.legendaParam;
     lista = widget.listaParam;
     dropdownValue = lista.first;
+    keyMap = widget.keyMapParam;
   }
 
   @override
@@ -54,7 +65,7 @@ class GavetinhaState extends State<Gavetinha> {
     return Container(
         // decoration: BoxDecoration(color: backgroundColor),
         decoration: BoxDecoration(color: backgroundColor),
-        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: Column(children: [
           Text(
             legenda,
@@ -70,9 +81,7 @@ class GavetinhaState extends State<Gavetinha> {
             style: TextStyle(color: textColor),
             onChanged: (String? value) {
               // This is called when the user selects an item.
-              setState(() {
-                dropdownValue = value!;
-              });
+              dropdownValue = value!;
             },
             items: lista.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(

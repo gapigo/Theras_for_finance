@@ -4,19 +4,22 @@ import './gavetinha.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 
-class DetailsScreen extends StatelessWidget {
+class DetailsScreen extends StatefulWidget {
   final String cardIndex;
   final String color_company;
   final String PM;
   final String nome_company;
   final String sector;
+  DetailsScreen(this.cardIndex, this.color_company, this.PM, this.nome_company,
+      this.sector);
+  @override
+  State<StatefulWidget> createState() => DetailsScreenState();
+}
 
+class DetailsScreenState extends State<DetailsScreen> {
   final double breakpoint = 800;
   final int paneProportion = 50;
-
-  const DetailsScreen(this.cardIndex, this.color_company, this.PM,
-      this.nome_company, this.sector,
-      {super.key});
+  Map? keyMap;
 
   Widget _getStatusContainer(String colorCompany) {
     Color backgroundColor;
@@ -41,6 +44,8 @@ class DetailsScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
     );
   }
+
+  // String tipoDoGrafico;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +77,7 @@ class DetailsScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
             child: FutureBuilder<String>(
               future: rootBundle.loadString(
-                  'asset/Empresas_data/${cardIndex}_fundamentalist.json'),
+                  'asset/Empresas_data/${widget.cardIndex}_fundamentalist.json'),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -92,7 +97,7 @@ class DetailsScreen extends StatelessWidget {
                   String Valormercado = view[0]['Valormercado'];
 
                   double screenWidth = MediaQuery.of(context).size.width;
-                  double screenHeight = MediaQuery.of(context).size.width;
+                  double screenHeight = MediaQuery.of(context).size.height;
 
                   return LayoutBuilder(
                     builder: (BuildContext context,
@@ -107,9 +112,9 @@ class DetailsScreen extends StatelessWidget {
                             Container(
                               // padding: const EdgeInsets.only(bottom: 30),
                               padding: EdgeInsets.fromLTRB(
-                                  screenWidth > 1000 ? 100 : 0,
+                                  screenWidth > 1000 ? 200 : 0,
                                   0,
-                                  screenWidth > 1000 ? 100 : 0,
+                                  screenWidth > 1000 ? 200 : 0,
                                   30),
                               child: Column(
                                 children: [
@@ -125,7 +130,7 @@ class DetailsScreen extends StatelessWidget {
                                               style:
                                                   const TextStyle(fontSize: 12),
                                             ),
-                                            borderedContainer(cardIndex,
+                                            borderedContainer(widget.cardIndex,
                                                 color: const Color.fromRGBO(
                                                     8, 32, 50, 50),
                                                 fontSize: 30,
@@ -144,7 +149,7 @@ class DetailsScreen extends StatelessWidget {
                                             height:
                                                 80, // Defina o tamanho desejado da altura da imagem
                                             child: Image.asset(
-                                              'image/company_imagens/$cardIndex.png',
+                                              'image/company_imagens/$widget.cardIndex.png',
                                               fit: BoxFit
                                                   .contain, // Ajuste a forma como a imagem é ajustada dentro do Container
                                             ),
@@ -163,7 +168,7 @@ class DetailsScreen extends StatelessWidget {
                                                 ),
                                                 PriceCard(
                                                   "Médio",
-                                                  PM,
+                                                  widget.PM,
                                                   backgroundColor:
                                                       Colors.orange,
                                                 ),
@@ -209,7 +214,8 @@ class DetailsScreen extends StatelessWidget {
                                         child: Flex(
                                             direction: Axis.vertical,
                                             children: [
-                                              borderedContainer(nome_company,
+                                              borderedContainer(
+                                                  widget.nome_company,
                                                   padding:
                                                       const EdgeInsets.fromLTRB(
                                                           10, 15, 10, 15),
@@ -217,7 +223,7 @@ class DetailsScreen extends StatelessWidget {
                                                       245, 255, 250, 1.0),
                                                   alignment:
                                                       Alignment.centerLeft),
-                                              borderedContainer(sector,
+                                              borderedContainer(widget.sector,
                                                   color: const Color.fromRGBO(
                                                       245, 255, 250, 1.0),
                                                   padding:
@@ -395,7 +401,8 @@ class DetailsScreen extends StatelessWidget {
                                     ],
                                   ),
                                   Container(
-                                    child: _getStatusContainer(color_company),
+                                    child: _getStatusContainer(
+                                        widget.color_company),
                                   ),
                                 ],
                               ),
@@ -414,11 +421,19 @@ class DetailsScreen extends StatelessWidget {
                                           ListaGavetinha().tipoDeGraficoLista,
                                           textColor: Colors.white,
                                           backgroundColor: Colors.black,
+                                          keyMap: (val) =>
+                                              setState(() => keyMap = val),
                                         ),
-                                        Gavetinha(
-                                            "INDICADORES",
-                                            ListaGavetinha()
-                                                .indicadoresPriceLista),
+                                        if (keyMap!['tipoGrafico'] == "Price")
+                                          Gavetinha(
+                                              "INDICADORES",
+                                              ListaGavetinha()
+                                                  .indicadoresPriceLista)
+                                        else
+                                          Gavetinha(
+                                              "INDICADORES",
+                                              ListaGavetinha()
+                                                  .indicadoresFundamentalistasLista),
                                         Gavetinha("AÇÃO",
                                             ListaGavetinha().acoesPriceLista),
                                       ],
@@ -442,7 +457,8 @@ class DetailsScreen extends StatelessWidget {
                                           child: SizedBox(
                                             height: 350,
                                             // width: 100,
-                                            child: GraficoLinear(cardIndex),
+                                            child:
+                                                GraficoLinear(widget.cardIndex),
                                           ),
                                         ),
                                       ),
